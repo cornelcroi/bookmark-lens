@@ -55,8 +55,8 @@ data/
 *.db
 *.lance/
 
-# Models (users download their own)
-models/
+# Downloaded ML models (not source code!)
+/models/
 .cache/
 
 # Environment

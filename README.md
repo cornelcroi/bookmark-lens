@@ -21,29 +21,9 @@ Save, search, and organize your bookmarks using AI-powered semantic search. Work
 
 ---
 
-## Quick Start
+## Quick Setup
 
-### Installation
-
-**Option 1: Using uvx (Recommended)**
-
-```bash
-uvx bookmark-lens
-```
-
-**Option 2: Using pip**
-
-```bash
-pip install bookmark-lens
-```
-
-That's it! No cloning, no setup, no configuration needed.
-
----
-
-## Usage with Claude Desktop
-
-### Setup
+### Claude Desktop
 
 1. Open your Claude Desktop config file:
    - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -62,19 +42,19 @@ That's it! No cloning, no setup, no configuration needed.
 }
 ```
 
-Or if installed with pip:
+3. Restart Claude Desktop
 
-```json
-{
-  "mcpServers": {
-    "bookmark-lens": {
-      "command": "bookmark-lens"
-    }
-  }
-}
+That's it! No installation, no setup, no configuration needed.
+
+### Other MCP Clients
+
+For other MCP-compatible clients, use:
+
+```bash
+uvx bookmark-lens
 ```
 
-3. Restart Claude Desktop
+---
 
 ### Example Conversations
 
