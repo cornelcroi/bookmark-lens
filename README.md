@@ -267,8 +267,8 @@ All configuration is via environment variables (`.env` file):
 
 ```bash
 # Database paths
-BOOKMARK_LENS_DB_PATH=./data/bookmark_lens.db
-LANCE_DB_PATH=./data/embeddings.lance
+BOOKMARK_LENS_DUCKDB_PATH=./data/bookmark_lens.db
+BOOKMARK_LENS_LANCEDB_PATH=./data/embeddings.lance
 
 # Embedding model
 EMBEDDING_MODEL_NAME=all-MiniLM-L6-v2

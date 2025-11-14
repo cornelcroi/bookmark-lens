@@ -26,11 +26,11 @@ Restart Claude Desktop and you're ready!
 
 ---
 
-## Configuration Options
+## Environment Variables
 
-### Environment Variables
+All configuration can be set via environment variables in your MCP server configuration.
 
-You can customize bookmark-lens behavior by setting environment variables in your MCP server configuration:
+### Complete Example
 
 ```json
 {
@@ -39,63 +39,87 @@ You can customize bookmark-lens behavior by setting environment variables in you
       "command": "uvx",
       "args": ["bookmark-lens"],
       "env": {
-        "BOOKMARK_LENS_HOME": "/custom/path/to/data",
+        "BOOKMARK_LENS_HOME": "/path/to/your/data",
+        "BOOKMARK_LENS_DUCKDB_PATH": "/custom/bookmarks.db",
+        "BOOKMARK_LENS_LANCEDB_PATH": "/custom/embeddings.lance",
         "EMBEDDING_MODEL_NAME": "all-mpnet-base-v2",
-        "EMBEDDING_DIMENSION": "768"
+        "EMBEDDING_DIMENSION": "768",
+        "BOOKMARK_LENS_FETCH_TIMEOUT": "60",
+        "BOOKMARK_LENS_USER_AGENT": "MyBookmarkManager/1.0",
+        "MAX_CONTENT_LENGTH": "100000"
       }
     }
   }
 }
 ```
 
-### Available Environment Variables
+### Available Variables
 
-#### Data Storage
+#### `BOOKMARK_LENS_HOME`
+**Purpose:** Base directory for all bookmark-lens data  
+**Default:** Platform-specific directory
+- macOS: `~/Library/Application Support/bookmark-lens`
+- Linux: `~/.local/share/bookmark-lens`
+- Windows: `%LOCALAPPDATA%\bookmark-lens`
 
-**`BOOKMARK_LENS_HOME`**
-- Override the default data directory location
-- Default: Platform-specific directory
-  - macOS: `~/Library/Application Support/bookmark-lens`
-  - Linux: `~/.local/share/bookmark-lens`
-  - Windows: `%LOCALAPPDATA%\bookmark-lens`
+**Example:** `"/Users/you/Documents/bookmarks"`
 
-**`BOOKMARK_LENS_DB_PATH`**
-- Path to DuckDB database file
-- Default: `{BOOKMARK_LENS_HOME}/bookmark_lens.db`
+---
 
-**`LANCE_DB_PATH`**
-- Path to LanceDB directory (vector embeddings)
-- Default: `{BOOKMARK_LENS_HOME}/embeddings.lance`
+#### `BOOKMARK_LENS_DUCKDB_PATH`
+**Purpose:** Path to DuckDB database file (stores bookmark metadata, tags, notes)  
+**Default:** `{BOOKMARK_LENS_HOME}/bookmark_lens.db`  
+**Example:** `"/data/bookmarks.db"`
 
-#### Embedding Configuration
+---
 
-**`EMBEDDING_MODEL_NAME`**
-- Sentence-transformers model name
-- Options:
-  - `all-MiniLM-L6-v2` (default) - 384 dimensions, fast, good quality
-  - `all-mpnet-base-v2` - 768 dimensions, better quality, slower
-- Default: `all-MiniLM-L6-v2`
+#### `BOOKMARK_LENS_LANCEDB_PATH`
+**Purpose:** Path to LanceDB directory (stores vector embeddings for semantic search)  
+**Default:** `{BOOKMARK_LENS_HOME}/embeddings.lance`  
+**Example:** `"/fast-ssd/embeddings.lance"`
 
-**`EMBEDDING_DIMENSION`**
-- Vector dimension (must match model)
-- Values:
-  - `384` for all-MiniLM-L6-v2
-  - `768` for all-mpnet-base-v2
-- Default: `384`
+---
 
-#### Content Fetching
+#### `EMBEDDING_MODEL_NAME`
+**Purpose:** Sentence-transformers model for generating embeddings  
+**Default:** `all-MiniLM-L6-v2`  
+**Options:**
+- `all-MiniLM-L6-v2` - 384 dimensions, ~90MB, fast, good quality
+- `all-mpnet-base-v2` - 768 dimensions, ~420MB, better quality, slower
 
-**`BOOKMARK_LENS_FETCH_TIMEOUT`**
-- HTTP fetch timeout in seconds
-- Default: `30`
+**Example:** `"all-mpnet-base-v2"`
 
-**`BOOKMARK_LENS_USER_AGENT`**
-- Custom User-Agent string for HTTP requests
-- Default: `bookmark-lens/0.1.0`
+---
 
-**`MAX_CONTENT_LENGTH`**
-- Maximum characters to store per bookmark
-- Default: `50000`
+#### `EMBEDDING_DIMENSION`
+**Purpose:** Vector dimension (must match the model)  
+**Default:** `384`  
+**Values:**
+- `384` for all-MiniLM-L6-v2
+- `768` for all-mpnet-base-v2
+
+**Example:** `"768"`
+
+---
+
+#### `BOOKMARK_LENS_FETCH_TIMEOUT`
+**Purpose:** HTTP timeout when fetching web pages (in seconds)  
+**Default:** `30`  
+**Example:** `"60"` (for slow sites)
+
+---
+
+#### `BOOKMARK_LENS_USER_AGENT`
+**Purpose:** Custom User-Agent string for HTTP requests  
+**Default:** `bookmark-lens/0.1.0`  
+**Example:** `"MyBookmarkManager/1.0"`
+
+---
+
+#### `MAX_CONTENT_LENGTH`
+**Purpose:** Maximum characters to extract and store per bookmark  
+**Default:** `50000`  
+**Example:** `"100000"` (for longer articles)
 
 ---
 

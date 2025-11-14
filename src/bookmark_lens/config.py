@@ -46,8 +46,9 @@ def load_config() -> Config:
     Load configuration from environment variables.
 
     Environment variables:
-        BOOKMARK_LENS_DB_PATH: Path to DuckDB database file
-        LANCE_DB_PATH: Path to LanceDB directory
+        BOOKMARK_LENS_HOME: Base directory for all data
+        BOOKMARK_LENS_DUCKDB_PATH: Path to DuckDB database file
+        BOOKMARK_LENS_LANCEDB_PATH: Path to LanceDB directory
         EMBEDDING_MODEL_NAME: Sentence-transformers model name
         EMBEDDING_DIMENSION: Vector dimension (must match model)
         BOOKMARK_LENS_FETCH_TIMEOUT: HTTP fetch timeout in seconds
@@ -63,11 +64,11 @@ def load_config() -> Config:
 
     # Database paths
     db_path = os.getenv(
-        "BOOKMARK_LENS_DB_PATH",
+        "BOOKMARK_LENS_DUCKDB_PATH",
         str(data_dir / "bookmark_lens.db")
     )
     lance_path = os.getenv(
-        "LANCE_DB_PATH",
+        "BOOKMARK_LENS_LANCEDB_PATH",
         str(data_dir / "embeddings.lance")
     )
 
