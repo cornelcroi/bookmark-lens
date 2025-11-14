@@ -11,9 +11,6 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
-import sys
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-
 from bookmark_lens.config import Config
 from bookmark_lens.database.duckdb_client import DuckDBClient
 from bookmark_lens.database.lancedb_client import LanceDBClient

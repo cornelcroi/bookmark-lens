@@ -65,6 +65,10 @@ Issues = "https://github.com/yourusername/bookmark-lens/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["bookmark_lens*"]
+
+[tool.setuptools.package-data]
+bookmark_lens = ["py.typed"]
 
 [tool.black]
 line-length = 100
