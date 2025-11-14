@@ -153,8 +153,11 @@ class ContentFetcher:
             Extracted content as Markdown
         """
         try:
+            # Decode bytes to string (readability expects string)
+            html_string = html_content.decode('utf-8', errors='ignore')
+            
             # Use readability to extract main content
-            doc = Document(html_content)
+            doc = Document(html_string)
             content_html = doc.summary()
 
             # Convert HTML to Markdown
