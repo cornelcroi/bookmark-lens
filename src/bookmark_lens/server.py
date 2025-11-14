@@ -43,7 +43,14 @@ async def list_tools() -> list[Tool]:
     return [
         Tool(
             name="save_bookmark",
-            description="""Save a new bookmark by URL with optional note and tags.
+            description="""Save a bookmark to the user's bookmark collection.
+
+IMPORTANT: Use this tool whenever the user asks to:
+- "Save this URL"
+- "Bookmark this"
+- "Add to bookmarks"
+- "Remember this page"
+- Or any similar request to save a URL
 
 After saving, consider helping the user by:
 1. Calling get_bookmark_content(id) to fetch the article
@@ -73,7 +80,16 @@ This provides a helpful summary without requiring an API key.""",
         ),
         Tool(
             name="search_bookmarks",
-            description="Search bookmarks semantically with optional filters. Supports natural language queries.",
+            description="""Search the user's bookmark collection using semantic search.
+
+IMPORTANT: Use this tool whenever the user asks to:
+- "Find bookmarks about..."
+- "Search my bookmarks for..."
+- "Show me bookmarks..."
+- "Do I have any bookmarks about..."
+- Or any similar request to find saved bookmarks
+
+Supports semantic search (meaning-based) with optional filters for domain, tags, and dates.""",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -259,15 +275,27 @@ async def get_prompt(name: str, arguments: dict | None = None) -> PromptMessage:
             role="user",
             content=TextContent(
                 type="text",
-                text="""You are a bookmark management assistant using the bookmark-lens MCP server.
+                text="""You are a bookmark management assistant with access to the bookmark-lens MCP server.
 
-Your job is to help users save, search, and organize bookmarks by:
-1. Saving bookmarks with save_bookmark (URL + optional note/tags)
-2. Searching semantically with search_bookmarks
-3. Converting natural language dates to ISO 8601 format
-4. Extracting filters from user queries
-5. Retrieving full details with get_bookmark
-6. Updating notes/tags with update_bookmark
+IMPORTANT: You HAVE the ability to manage bookmarks through the available tools. When users ask to save, search, or manage bookmarks, USE THE TOOLS.
+
+Your capabilities:
+1. Save bookmarks - Use save_bookmark when users say "save", "bookmark", "add to bookmarks", "remember this"
+2. Search bookmarks - Use search_bookmarks when users say "find", "search", "show me bookmarks"
+3. Get bookmark details - Use get_bookmark to retrieve full information
+4. Update bookmarks - Use update_bookmark to modify notes or tags
+5. Delete bookmarks - Use delete_bookmark to remove bookmarks
+6. List tags - Use list_tags to show all available tags
+7. Get statistics - Use get_bookmark_stats for analytics
+8. Get content - Use get_bookmark_content to fetch and summarize articles
+
+Common User Requests:
+- "Save this URL" → Use save_bookmark
+- "Bookmark this page" → Use save_bookmark
+- "Add to my bookmarks" → Use save_bookmark
+- "Find bookmarks about X" → Use search_bookmarks
+- "Show me my bookmarks" → Use search_bookmarks with broad query
+- "Summarize this bookmark" → Use get_bookmark_content then summarize
 
 Date Conversion Rules:
 - "today" → current date at 00:00:00Z
