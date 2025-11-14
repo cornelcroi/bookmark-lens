@@ -6,9 +6,21 @@ Loads configuration from environment variables with sensible defaults.
 
 import os
 from pathlib import Path
-from typing import Optional
 from dataclasses import dataclass
-from dotenv import load_dotenv
+
+import platformdirs
+
+
+def get_base_dir() -> Path:
+    """
+    Get the base directory for bookmark-lens data.
+    
+    Can be overridden with BOOKMARK_LENS_HOME environment variable.
+    Otherwise uses platform-specific data directory.
+    """
+    if home := os.getenv("BOOKMARK_LENS_HOME"):
+        return Path(home)
+    return Path(platformdirs.user_data_dir("bookmark-lens"))
 
 
 @dataclass
@@ -45,14 +57,9 @@ def load_config() -> Config:
     Returns:
         Config instance with loaded or default values
     """
-    # Load .env file if it exists
-    env_file = Path(".env")
-    if env_file.exists():
-        load_dotenv(env_file)
-
-    # Get or create default data directory
-    data_dir = Path("./data")
-    data_dir.mkdir(exist_ok=True)
+    # Use platform-specific data directory
+    data_dir = get_base_dir()
+    data_dir.mkdir(parents=True, exist_ok=True)
 
     # Database paths
     db_path = os.getenv(

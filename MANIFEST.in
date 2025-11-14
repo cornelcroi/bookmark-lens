@@ -1,7 +1,7 @@
 include README.md
 include LICENSE
 include CHANGELOG.md
-include .env.example
+include SETUP.md
 recursive-include src *.py
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
