@@ -1,4 +1,4 @@
-# 🔖 bookmark-lens
+# Bookmark Lens
 
 **A local-first MCP server for intelligent bookmark management with semantic search.**
 
@@ -23,45 +23,21 @@ Save, search, and organize your bookmarks using AI-powered semantic search. Work
 
 ## Quick Start
 
-### 1. Installation
+### Installation
+
+**Option 1: Using uvx (Recommended)**
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/bookmark-lens.git
-cd bookmark-lens
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -e .
+uvx bookmark-lens
 ```
 
-### 2. Configuration
-
-Copy the example environment file:
+**Option 2: Using pip**
 
 ```bash
-cp .env.example .env
+pip install bookmark-lens
 ```
 
-Edit `.env` if you want to customize paths or settings (optional - defaults work fine).
-
-### 3. Test It
-
-Run the manual test script to verify everything works:
-
-```bash
-python -m tests.manual_test
-```
-
-This will:
-- Initialize databases
-- Load the embedding model
-- Save test bookmarks
-- Run semantic searches
-- Test all CRUD operations
+That's it! No cloning, no setup, no configuration needed.
 
 ---
 
@@ -79,15 +55,20 @@ This will:
 {
   "mcpServers": {
     "bookmark-lens": {
-      "command": "python",
-      "args": [
-        "-m",
-        "bookmark_lens.server"
-      ],
-      "cwd": "/absolute/path/to/bookmark-lens",
-      "env": {
-        "PYTHONPATH": "/absolute/path/to/bookmark-lens/src"
-      }
+      "command": "uvx",
+      "args": ["bookmark-lens"]
+    }
+  }
+}
+```
+
+Or if installed with pip:
+
+```json
+{
+  "mcpServers": {
+    "bookmark-lens": {
+      "command": "bookmark-lens"
     }
   }
 }
@@ -413,26 +394,21 @@ The server only accepts ISO 8601 format - the LLM does the conversion.
 
 ## Development
 
+Want to contribute? See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
+
 ### Running Tests
 
 ```bash
-# Manual end-to-end test
-python -m tests.manual_test
+# Clone the repository
+git clone https://github.com/yourusername/bookmark-lens.git
+cd bookmark-lens
 
-# Test with MCP Inspector (if installed)
-npx @modelcontextprotocol/inspector python -m bookmark_lens.server
+# Install in development mode
+pip install -e ".[dev]"
+
+# Run tests
+python tests/test_simple.py
 ```
-
-### Project Structure
-
-- **Phase 1**: Project setup ✅
-- **Phase 2**: Database layer ✅
-- **Phase 3**: Core services ✅
-- **Phase 4**: MCP server ✅
-- **Phase 5**: Testing & docs ✅
-- **Phase 6**: Final polish (in progress)
-
-See `TASKS.md` for detailed implementation tracking.
 
 ---
 

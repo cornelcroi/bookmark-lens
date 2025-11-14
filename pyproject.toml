@@ -55,6 +55,9 @@ dev = [
     "mypy>=1.5.0",
 ]
 
+[project.scripts]
+bookmark-lens = "bookmark_lens.server:run"
+
 [project.urls]
 Homepage = "https://github.com/yourusername/bookmark-lens"
 Repository = "https://github.com/yourusername/bookmark-lens"
