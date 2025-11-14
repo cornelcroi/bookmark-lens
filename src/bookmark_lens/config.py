@@ -28,13 +28,6 @@ class Config:
     user_agent: str
     max_content_length: int
 
-    # LLM configuration (Phase 2 - Smart Mode)
-    llm_model: Optional[str] = None
-    llm_api_key: Optional[str] = None
-    llm_api_base: Optional[str] = None
-    llm_temperature: float = 0.3
-    use_llm: bool = False
-
 
 def load_config() -> Config:
     """
@@ -48,10 +41,6 @@ def load_config() -> Config:
         BOOKMARK_LENS_FETCH_TIMEOUT: HTTP fetch timeout in seconds
         BOOKMARK_LENS_USER_AGENT: Custom User-Agent string
         MAX_CONTENT_LENGTH: Maximum characters to store per bookmark
-        LLM_MODEL: LLM model name (optional, enables Smart Mode)
-        LLM_API_KEY: LLM API key (optional, enables Smart Mode)
-        LLM_API_BASE: Custom API endpoint (optional)
-        LLM_TEMPERATURE: LLM temperature 0.0-1.0 (optional, default 0.3)
 
     Returns:
         Config instance with loaded or default values
@@ -97,13 +86,6 @@ def load_config() -> Config:
     )
     max_content_length = int(os.getenv("MAX_CONTENT_LENGTH", "50000"))
 
-    # LLM configuration (Phase 2 - Smart Mode)
-    llm_model = os.getenv("LLM_MODEL")
-    llm_api_key = os.getenv("LLM_API_KEY")
-    llm_api_base = os.getenv("LLM_API_BASE")
-    llm_temperature = float(os.getenv("LLM_TEMPERATURE", "0.3"))
-    use_llm = bool(llm_model and llm_api_key)
-
     config = Config(
         db_path=db_path,
         lance_path=lance_path,
@@ -111,12 +93,7 @@ def load_config() -> Config:
         embedding_dimension=embedding_dimension,
         fetch_timeout=fetch_timeout,
         user_agent=user_agent,
-        max_content_length=max_content_length,
-        llm_model=llm_model,
-        llm_api_key=llm_api_key,
-        llm_api_base=llm_api_base,
-        llm_temperature=llm_temperature,
-        use_llm=use_llm,
+        max_content_length=max_content_length
     )
 
     # Validate configuration

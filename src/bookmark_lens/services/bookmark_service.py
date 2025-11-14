@@ -15,7 +15,6 @@ from ..database.lancedb_client import LanceDBClient
 from ..models.bookmark import BookmarkCreate, Bookmark, BookmarkUpdate
 from .content_fetcher import ContentFetcher
 from .embedding_service import EmbeddingService
-from .llm_service import LLMService
 
 logger = logging.getLogger(__name__)
 
@@ -29,15 +28,13 @@ class BookmarkService:
         duckdb_client: DuckDBClient,
         lancedb_client: LanceDBClient,
         content_fetcher: ContentFetcher,
-        embedding_service: EmbeddingService,
-        llm_service: Optional[LLMService] = None
+        embedding_service: EmbeddingService
     ):
         self.config = config
         self.duckdb = duckdb_client
         self.lancedb = lancedb_client
         self.content_fetcher = content_fetcher
         self.embedding_service = embedding_service
-        self.llm_service = llm_service
 
     def save_bookmark(self, bookmark_create: BookmarkCreate) -> Bookmark:
         """
@@ -69,64 +66,23 @@ class BookmarkService:
             )
             return self.update_bookmark(existing_id, update)
 
-        # Fetch content (full content only if Smart Mode enabled)
-        if self.config.use_llm:
-            logger.info(f"Fetching full content (Smart Mode): {url}")
-        else:
-            logger.info(f"Fetching title/description only (Core Mode): {url}")
-        
-        content_result = self.content_fetcher.fetch(url, full_content=self.config.use_llm)
+        # Fetch content
+        logger.info(f"Fetching content: {url}")
+        content_result = self.content_fetcher.fetch(url, full_content=True)
 
-        # LLM Enhancements (Smart Mode)
-        auto_tags = []
-        if self.config.use_llm and self.llm_service:
-            try:
-                logger.info("Generating LLM enhancements...")
-                
-                # Generate summaries
-                summaries = self.llm_service.summarize(
-                    content_result.content_text,
-                    content_result.title
-                )
-                bookmark_data_summary_short = summaries.short
-                bookmark_data_summary_long = summaries.long
-                logger.info("Summaries generated")
-                
-                # Generate auto-tags
-                auto_tags = self.llm_service.generate_tags(
-                    content_result.content_text,
-                    content_result.title
-                )
-                logger.info(f"Auto-tags generated: {auto_tags}")
-                
-                # Classify topic
-                bookmark_data_topic = self.llm_service.classify_topic(
-                    content_result.content_text,
-                    content_result.title
-                )
-                logger.info(f"Topic classified: {bookmark_data_topic}")
-                
-            except Exception as e:
-                logger.warning(f"LLM enhancement failed: {e}")
-                # Continue without enhancements (graceful degradation)
-                bookmark_data_summary_short = None
-                bookmark_data_summary_long = None
-                bookmark_data_topic = None
-        else:
-            bookmark_data_summary_short = None
-            bookmark_data_summary_long = None
-            bookmark_data_topic = None
+        # Prepare bookmark data
+        bookmark_data_summary_short = None
+        bookmark_data_summary_long = None
+        bookmark_data_topic = None
 
-        # Build embedding text (includes LLM enhancements if available)
-        all_tags = bookmark_create.manual_tags + auto_tags
-        
+        # Build embedding text
         embedding_text = self.embedding_service.build_embedding_text(
             title=content_result.title,
             description=content_result.description,
             content_text=content_result.content_text,
             user_note=bookmark_create.note,
             summary=bookmark_data_summary_short,
-            tags=all_tags if all_tags else None,
+            tags=bookmark_create.manual_tags if bookmark_create.manual_tags else None,
             topic=bookmark_data_topic
         )
 
@@ -166,14 +122,6 @@ class BookmarkService:
                     source="manual"
                 )
             
-            # Store auto-tags (Smart Mode)
-            if auto_tags:
-                self.duckdb.add_tags(
-                    bookmark_id,
-                    auto_tags,
-                    source="auto"
-                )
-
             # Store embedding in LanceDB
             self.lancedb.add_embedding(
                 bookmark_id=bookmark_id,

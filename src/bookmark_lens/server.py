@@ -18,7 +18,6 @@ from .services.content_fetcher import ContentFetcher
 from .services.embedding_service import EmbeddingService
 from .services.bookmark_service import BookmarkService
 from .services.search_service import SearchService
-from .services.llm_service import LLMService
 
 # Setup logging
 logging.basicConfig(
@@ -36,7 +35,6 @@ duckdb_client: Optional[DuckDBClient] = None
 lancedb_client: Optional[LanceDBClient] = None
 bookmark_service: Optional[BookmarkService] = None
 search_service: Optional[SearchService] = None
-llm_service: Optional[LLMService] = None
 
 
 @app.list_tools()
@@ -45,7 +43,14 @@ async def list_tools() -> list[Tool]:
     return [
         Tool(
             name="save_bookmark",
-            description="Save a new bookmark by URL with optional note and tags",
+            description="""Save a new bookmark by URL with optional note and tags.
+
+After saving, consider helping the user by:
+1. Calling get_bookmark_content(id) to fetch the article
+2. Summarizing the content for them
+3. Calling update_bookmark(id, note=summary) to save the summary
+
+This provides a helpful summary without requiring an API key.""",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -208,6 +213,29 @@ async def list_tools() -> list[Tool]:
                 },
                 "required": []
             }
+        ),
+        Tool(
+            name="get_bookmark_content",
+            description="""Get the full content of a bookmark in Markdown format.
+
+Use this tool when the user wants to:
+- Read the full article content
+- Get a summary of the bookmark (you will summarize the returned content)
+- Analyze or discuss the bookmark content in detail
+- Quote specific parts of the article
+- Get fresh content from the URL
+
+After calling this tool, YOU should summarize or analyze the content based on what the user asked.""",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "The bookmark ID"
+                    }
+                },
+                "required": ["id"]
+            }
         )
     ]
 
@@ -316,6 +344,8 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             return await handle_list_tags(arguments)
         elif name == "get_bookmark_stats":
             return await handle_get_bookmark_stats(arguments)
+        elif name == "get_bookmark_content":
+            return await handle_get_bookmark_content(arguments)
         else:
             return [TextContent(
                 type="text",
@@ -880,50 +910,102 @@ async def handle_get_bookmark_stats(arguments: dict) -> list[TextContent]:
         )]
 
 
+async def handle_get_bookmark_content(arguments: dict) -> list[TextContent]:
+    """Handle get_bookmark_content tool call."""
+    import json
+    
+    bookmark_id = arguments.get("id")
+    if not bookmark_id:
+        return [TextContent(
+            type="text",
+            text=json.dumps({
+                "success": False,
+                "error": "Missing required argument 'id'"
+            }, indent=2)
+        )]
+    
+    try:
+        bookmark = bookmark_service.get_bookmark(bookmark_id)
+        
+        if not bookmark:
+            return [TextContent(
+                type="text",
+                text=json.dumps({
+                    "success": False,
+                    "message": f"Bookmark not found: {bookmark_id}"
+                }, indent=2)
+            )]
+        
+        # Fetch fresh content from URL
+        from .services.content_fetcher import ContentFetcher
+        fetcher = ContentFetcher(config)
+        content_result = fetcher.fetch(bookmark.url, full_content=True)
+        
+        if not content_result.fetch_success:
+            return [TextContent(
+                type="text",
+                text=json.dumps({
+                    "success": False,
+                    "message": f"Failed to fetch content: {content_result.error_message}"
+                }, indent=2)
+            )]
+        
+        response = {
+            "success": True,
+            "bookmark": {
+                "id": bookmark.id,
+                "url": bookmark.url,
+                "title": bookmark.title or content_result.title,
+                "note": bookmark.user_note
+            },
+            "content_markdown": content_result.content_text,
+            "message": "Content fetched successfully. You can now summarize or analyze it."
+        }
+        
+        logger.info(f"Fetched content for bookmark: {bookmark_id}")
+        return [TextContent(
+            type="text",
+            text=json.dumps(response, indent=2)
+        )]
+        
+    except Exception as e:
+        logger.error(f"Failed to get bookmark content {bookmark_id}: {e}", exc_info=True)
+        return [TextContent(
+            type="text",
+            text=json.dumps({
+                "success": False,
+                "error": str(e)
+            }, indent=2)
+        )]
+
+
 async def main():
     """Initialize services and start MCP server."""
-    global config, duckdb_client, lancedb_client, bookmark_service, search_service, llm_service
+    global config, duckdb_client, lancedb_client, bookmark_service, search_service
 
     logger.info("Starting bookmark-lens MCP server...")
 
-    # Load configuration
     config = load_config()
     logger.info(f"Configuration loaded: DB={config.db_path}, Model={config.embedding_model_name}")
 
-    # Initialize DuckDB
     duckdb_client = DuckDBClient(config.db_path)
     duckdb_client.initialize_schema()
     logger.info("DuckDB initialized")
 
-    # Initialize LanceDB
     lancedb_client = LanceDBClient(config.lance_path, config.embedding_dimension)
     lancedb_client.initialize_table()
     logger.info("LanceDB initialized")
 
-    # Initialize services
     content_fetcher = ContentFetcher(config)
     embedding_service = EmbeddingService(config)
-    logger.info("Core services initialized")
-
-    # Initialize LLM service if Smart Mode enabled
-    if config.use_llm:
-        try:
-            llm_service = LLMService(config)
-            logger.info("LLM service initialized (Smart Mode enabled)")
-        except Exception as e:
-            logger.warning(f"Failed to initialize LLM service: {e}")
-            logger.warning("Continuing in Core Mode (Smart Mode disabled)")
-            llm_service = None
-    else:
-        logger.info("Smart Mode disabled (no LLM configuration)")
+    logger.info("Services initialized")
 
     bookmark_service = BookmarkService(
         config,
         duckdb_client,
         lancedb_client,
         content_fetcher,
-        embedding_service,
-        llm_service
+        embedding_service
     )
 
     search_service = SearchService(

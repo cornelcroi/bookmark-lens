@@ -109,12 +109,7 @@ def config(temp_dir):
         embedding_dimension=384,
         fetch_timeout=30,
         user_agent="test-agent",
-        max_content_length=50000,
-        use_llm=False,  # Core Mode
-        llm_model=None,
-        llm_api_key=None,
-        llm_api_base=None,
-        llm_temperature=0.7
+        max_content_length=50000
     )
 
 
@@ -137,8 +132,7 @@ def services(config):
         duckdb,
         lancedb,
         content_fetcher,
-        embedding_service,
-        llm_service=None  # No LLM in Core Mode
+        embedding_service
     )
     
     search_service = SearchService(
