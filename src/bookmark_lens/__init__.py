@@ -1,6 +1,6 @@
 """bookmark-lens: Local-first bookmark management with semantic search."""
 
-__version__ = "0.0.6"
+__version__ = "0.0.7"
 __author__ = "Corneliu Croitoru"
 __email__ = "your.email@example.com"
 
