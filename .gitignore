@@ -16,85 +16,49 @@ parts/
 sdist/
 var/
 wheels/
-pip-wheel-metadata/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # Virtual environments
 venv/
-ENV/
 env/
-.venv/
+ENV/
+.venv
 
 # Testing
 .pytest_cache/
 .coverage
-.coverage.*
 htmlcov/
 .tox/
-.nox/
-coverage.xml
-*.cover
-.hypothesis/
+.mypy_cache/
 
-# IDEs
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# OS
 .DS_Store
+Thumbs.db
 
-# Data and logs
-logs/
-*.log
-data/
+# Project specific - bookmark databases
 *.db
+*.duckdb
+*.duckdb.wal
 *.lance/
+data/
+embeddings/
 
-# Downloaded ML models (not source code!)
-/models/
-.cache/
+# Temporary files
+*.tmp
+*.log
 
-# Environment
+# Development
 .env
 .env.local
 
-# Distribution
-dist/
-build/
-
-# MyPy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Jupyter
-.ipynb_checkpoints
-
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Project specific - keep examples
-!.env.example
-
-# Temporary files
-temp/
-tmp/
-*.tmp
-
-# Documentation builds
-docs/_build/
-site/
-
-.claude/
+# Backup files
+*.backup

@@ -1,23 +1,46 @@
 # Bookmark Lens
 
-**A local-first MCP server for intelligent bookmark management with semantic search.**
+**Your AI assistant remembers everything you've saved.**
 
-Save, search, and organize your bookmarks using AI-powered semantic search. Works completely offline (no LLM required for core features).
+[![PyPI version](https://badge.fury.io/py/bookmark-lens.svg)](https://badge.fury.io/py/bookmark-lens)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
----
+## What is Bookmark Lens?
+
+Tired of losing bookmarks in browser folders? Searching for "that article about React hooks" but can't remember if it mentioned "hooks" or "useState" or "functional components"?
+
+**Bookmark Lens** solves this with semantic search. Find bookmarks by what they're *about*, not just exact keywords. Search "authentication tutorials" and get results about login systems, OAuth, JWT - even if they never mention the word "authentication."
+
+**Traditional bookmarks:** Folders → Subfolder → Where did I save it? → Give up, Google it again
+**With Bookmark Lens:** "Find that React tutorial from last week" → Found instantly
+
+All processing happens locally on your machine. Your bookmarks stay private.
+
+## See It In Action
+
+*Demo coming soon - intelligent bookmark search in action*
+
+## Why Bookmark Lens?
+
+- **🧠 Semantic Search** - Find by meaning, not keywords
+- **🔒 100% Private** - Everything local, nothing sent to cloud
+- **⚡ Works Offline** - No internet needed after first setup
+- **🆓 Completely Free** - No API keys for core features
+- **🤖 AI-Powered** - Optional LLM enhancements (summaries, auto-tags)
 
 ## Features
 
-- 🔍 **Semantic Search** - Find bookmarks by meaning, not just keywords
-- 📝 **Rich Metadata** - Automatic extraction of titles, descriptions, and content
-- 🤖 **Smart Mode** - LLM-powered summaries, auto-tags, and topic classification (optional)
-- 🏷️ **Smart Tagging** - Manual tags + auto-generated tags (Smart Mode)
-- 📊 **Topic Classification** - Automatic categorization (Smart Mode)
-- 📅 **Date Filtering** - Search by time ranges (natural language supported via LLM)
-- 🌐 **Domain Filtering** - Filter by website
-- 💾 **Local-First** - All data stored locally (DuckDB + LanceDB)
-- 🤖 **MCP Native** - Works with Claude Desktop and other MCP clients
-- ⚡ **Fast** - Local embeddings with sentence-transformers
+- **Semantic Search** - Find bookmarks by meaning, not just keywords
+- **Rich Metadata** - Automatic extraction of titles, descriptions, and content
+- **Smart Mode** - LLM-powered summaries, auto-tags, and topic classification (optional)
+- **Smart Tagging** - Manual tags + auto-generated tags (Smart Mode)
+- **Topic Classification** - Automatic categorization (Smart Mode)
+- **Date Filtering** - Search by time ranges (natural language supported via LLM)
+- **Domain Filtering** - Filter by website
+- **Local-First** - All data stored locally (DuckDB + LanceDB)
+- **MCP Native** - Works with Claude Desktop and other MCP clients
+- **Fast** - Local embeddings with sentence-transformers
 
 ---
 
@@ -56,36 +79,88 @@ uvx bookmark-lens
 
 ---
 
-### Example Conversations
+## Example Conversations
 
-**Save a bookmark:**
-```
-You: Save https://docs.anthropic.com/en/docs/build-with-claude/model-context-protocol 
-     with note "MCP documentation for building servers"
+### Research Workflow
 
-Claude: [Saves bookmark with automatic title/content extraction]
+```
+You: Save https://arxiv.org/abs/2401.12345 with note "Interesting paper on attention mechanisms"
+
+Claude: Saved! I've extracted:
+- Title: "Efficient Attention: A Survey"
+- Description: Comprehensive review of attention mechanisms...
+- Auto-generated tags: #ai #research #attention #transformers
+
+You: Find papers about attention from this month
+
+Claude: Found 3 bookmarks:
+1. "Efficient Attention: A Survey" (arxiv.org) - Today
+   Tags: ai, research, attention, transformers
+
+2. "Flash Attention Implementation" (github.com) - 3 days ago
+   Tags: pytorch, optimization, gpu
+
+3. "Attention is All You Need - Annotated" (nlp.seas.harvard.edu) - 1 week ago
+   Tags: tutorial, transformers, nlp
 ```
 
-**Search bookmarks:**
-```
-You: Find bookmarks about AI agents from last week
+### Learning Path
 
-Claude: [Converts "last week" to date range, searches semantically]
+```
+You: I'm learning React. Save good tutorials as I find them with tag #react-learning
+
+Claude: Great! I'll tag them for you.
+
+You: [Later] Show me all my React learning resources
+
+Claude: You have 12 React bookmarks:
+
+**Fundamentals (4 bookmarks):**
+- Official React Docs - react.dev
+- React Tutorial for Beginners - youtube.com
+- Thinking in React - beta.reactjs.org
+
+**Advanced (5 bookmarks):**
+- Custom Hooks Patterns - usehooks.com
+- React Performance Optimization - web.dev
+...
+
+You: Which ones cover hooks?
+
+Claude: 8 of your bookmarks discuss hooks:
+[Semantic search finds all hook-related content even without "hooks" in title]
 ```
 
-**Search with filters:**
-```
-You: Show me GitHub bookmarks about React
+### Content Curation
 
-Claude: [Searches with domain filter and semantic query]
+```
+You: Show me my GitHub bookmarks by topic
+
+Claude: Here's the breakdown:
+
+**AI/ML (15 bookmarks)**
+- Transformer models
+- LLM training techniques
+- Embedding systems
+
+**Frontend (23 bookmarks)**
+- React ecosystem
+- Build tools
+- State management
+
+**DevOps (8 bookmarks)**
+- Kubernetes guides
+- CI/CD pipelines
+
+You: What are my top 3 most-saved domains?
+
+Claude:
+1. github.com - 47 bookmarks
+2. medium.com - 23 bookmarks
+3. dev.to - 18 bookmarks
 ```
 
-**Update bookmarks:**
-```
-You: Add tag "tutorial" to that bookmark
-
-Claude: [Updates tags while preserving existing ones]
-```
+> **More examples:** See [USAGE_GUIDE.md](USAGE_GUIDE.md) for detailed workflows and advanced query patterns.
 
 ---
 
@@ -119,6 +194,36 @@ bookmark-lens/
 - **sentence-transformers** - Local embedding model (all-MiniLM-L6-v2)
 - **readability-lxml** - Content extraction from web pages
 - **Pydantic** - Data validation and serialization
+
+> **Technical deep-dive:** See [TECHNICAL.md](TECHNICAL.md) for hybrid search architecture, performance benchmarks, and implementation details.
+
+---
+
+## FAQ
+
+**How is this different from browser bookmarks?**
+Browser bookmarks use folders and exact name matching. Bookmark Lens uses AI to understand meaning. Search "authentication" and find bookmarks about login, OAuth, JWT - even if they never use that word.
+
+**What about Raindrop.io or Pocket?**
+They're cloud-based (your data on their servers) and require subscriptions for advanced features. Bookmark Lens is 100% local and free. Your data never leaves your machine.
+
+**Do I need an API key?**
+No! Core features (save, search, tag) work completely offline with no API keys. Smart Mode (auto-summaries, auto-tags) is optional and uses your own LLM API key.
+
+**How much does Smart Mode cost?**
+With Claude Haiku: ~$0.0005 per bookmark (half a cent). Process 1000 bookmarks for $0.50. It's optional - core features are free.
+
+**Is my data private?**
+100% private. Everything runs locally. Core features don't use the internet at all. Smart Mode only sends bookmark content to your chosen LLM (not to us).
+
+**What if I have thousands of bookmarks?**
+Bookmark Lens handles thousands easily. Vector search is fast even with large collections. The sentence-transformer model runs locally on your CPU.
+
+**Why semantic search instead of keywords?**
+Keywords fail when you don't remember exact words. "Find that authentication tutorial" won't find "OAuth guide for beginners." Semantic search understands they're about the same topic.
+
+**Can I export my bookmarks?**
+Not yet (roadmap feature). Currently, data is in local DuckDB + LanceDB databases. You can access them directly if needed.
 
 ---
 
