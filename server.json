@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.cornelcroi/bookmark-lens",
+  "title": "Bookmark Lens",
+  "description": "Local-first bookmark management with semantic search and AI-powered organization",
+  "version": "0.0.5",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "bookmark-lens",
+      "version": "0.0.5",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
