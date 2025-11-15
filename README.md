@@ -164,6 +164,8 @@ Claude:
 
 ---
 
+<!-- mcp-name: io.github.cornelcroi/bookmark-lens -->
+
 ## Architecture
 
 ```
