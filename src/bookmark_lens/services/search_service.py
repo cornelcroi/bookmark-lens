@@ -79,7 +79,6 @@ class SearchService:
         """
         params = bookmark_ids.copy()
 
-        # Add filters
         if query.domain:
             sql += " AND b.domain = ?"
             params.append(query.domain)
@@ -98,10 +97,8 @@ class SearchService:
 
         sql += " GROUP BY b.id, b.url, b.title, b.description, b.summary_short, b.topic, b.created_at"
 
-        # Execute query
         raw_results = self.duckdb.execute(sql, params)
-        
-        # Convert tuples to dicts
+
         columns = ["id", "url", "title", "description", "summary_short", "topic", "created_at", "tags"]
         results = [dict(zip(columns, row)) for row in raw_results]
 

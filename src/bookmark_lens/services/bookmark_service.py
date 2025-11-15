@@ -58,7 +58,6 @@ class BookmarkService:
         existing_id = self.duckdb.bookmark_exists(url)
         if existing_id:
             logger.info(f"Bookmark already exists: {existing_id}, updating...")
-            # Update existing bookmark
             update = BookmarkUpdate(
                 note=bookmark_create.note,
                 manual_tags=bookmark_create.manual_tags,
@@ -66,16 +65,13 @@ class BookmarkService:
             )
             return self.update_bookmark(existing_id, update)
 
-        # Fetch content
         logger.info(f"Fetching content: {url}")
         content_result = self.content_fetcher.fetch(url, full_content=True)
 
-        # Prepare bookmark data
         bookmark_data_summary_short = None
         bookmark_data_summary_long = None
         bookmark_data_topic = None
 
-        # Build embedding text
         embedding_text = self.embedding_service.build_embedding_text(
             title=content_result.title,
             description=content_result.description,
@@ -86,10 +82,8 @@ class BookmarkService:
             topic=bookmark_data_topic
         )
 
-        # Generate embedding
         embedding = self.embedding_service.generate_embedding(embedding_text)
 
-        # Create bookmark record
         bookmark_id = str(uuid.uuid4())
         now = datetime.utcnow()
 
@@ -181,7 +175,6 @@ class BookmarkService:
         Raises:
             ValueError: If bookmark not found
         """
-        # Get existing bookmark
         existing = self.duckdb.get_bookmark(bookmark_id)
         if not existing:
             raise ValueError(f"Bookmark {bookmark_id} not found")
@@ -215,7 +208,6 @@ class BookmarkService:
                 # Delete existing manual tags
                 self.duckdb.delete_tags(bookmark_id, source="manual")
 
-            # Add new tags
             self.duckdb.add_tags(
                 bookmark_id,
                 update.manual_tags,
@@ -240,7 +232,6 @@ class BookmarkService:
         if not deleted:
             return False
 
-        # Delete from LanceDB
         self.lancedb.delete_embedding(bookmark_id)
 
         logger.info(f"Deleted bookmark: {bookmark_id}")

@@ -26,7 +26,6 @@ class DuckDBClient:
         # Ensure parent directory exists
         Path(db_path).parent.mkdir(parents=True, exist_ok=True)
 
-        # Create connection
         self.conn = duckdb.connect(db_path)
 
     def initialize_schema(self) -> None:
@@ -38,7 +37,6 @@ class DuckDBClient:
             - bookmark_tags table (tags for bookmarks)
             - Indexes for common queries
         """
-        # Create bookmarks table
         self.conn.execute("""
             CREATE TABLE IF NOT EXISTS bookmarks (
                 id TEXT PRIMARY KEY,
@@ -57,7 +55,6 @@ class DuckDBClient:
             )
         """)
 
-        # Create indexes for common queries
         self.conn.execute("""
             CREATE INDEX IF NOT EXISTS idx_bookmarks_url
             ON bookmarks(url)
@@ -73,7 +70,6 @@ class DuckDBClient:
             ON bookmarks(created_at)
         """)
 
-        # Create bookmark_tags table
         self.conn.execute("""
             CREATE TABLE IF NOT EXISTS bookmark_tags (
                 id TEXT PRIMARY KEY,
@@ -83,7 +79,6 @@ class DuckDBClient:
             )
         """)
 
-        # Create indexes for tag queries
         self.conn.execute("""
             CREATE INDEX IF NOT EXISTS idx_tags_bookmark_id
             ON bookmark_tags(bookmark_id)
@@ -124,7 +119,6 @@ class DuckDBClient:
             if field not in bookmark_data:
                 raise ValueError(f"Missing required field: {field}")
 
-        # Insert bookmark
         self.conn.execute("""
             INSERT INTO bookmarks (
                 id, url, domain, title, description, content_text,
@@ -203,7 +197,6 @@ class DuckDBClient:
             set_clauses.append(f"{key} = ?")
             values.append(value)
 
-        # Add bookmark_id for WHERE clause
         values.append(bookmark_id)
 
         sql = f"""
@@ -236,7 +229,6 @@ class DuckDBClient:
             DELETE FROM bookmark_tags WHERE bookmark_id = ?
         """, [bookmark_id])
 
-        # Delete bookmark
         self.conn.execute("""
             DELETE FROM bookmarks WHERE id = ?
         """, [bookmark_id])
@@ -284,7 +276,6 @@ class DuckDBClient:
             # Generate tag ID
             tag_id = str(uuid.uuid4())
 
-            # Insert tag
             self.conn.execute("""
                 INSERT INTO bookmark_tags (id, bookmark_id, tag, source)
                 VALUES (?, ?, ?, ?)

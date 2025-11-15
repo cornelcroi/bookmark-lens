@@ -59,7 +59,6 @@ class LanceDBClient:
             self.table = self.db.open_table(self.table_name)
         except Exception:
             # Table doesn't exist, create it with empty data
-            # Create empty DataFrame with correct schema
             empty_data = {
                 "bookmark_id": [],
                 "embedding": [],
@@ -68,10 +67,8 @@ class LanceDBClient:
                 "created_at": []
             }
 
-            # Convert to PyArrow table
             empty_table = pa.table(empty_data, schema=schema)
 
-            # Create LanceDB table
             self.table = self.db.create_table(
                 self.table_name,
                 empty_table,
@@ -111,7 +108,6 @@ class LanceDBClient:
             # Delete old embedding first
             self.delete_embedding(bookmark_id)
 
-        # Prepare data
         data = [{
             "bookmark_id": bookmark_id,
             "embedding": embedding.tolist(),
@@ -120,7 +116,6 @@ class LanceDBClient:
             "created_at": datetime.utcnow()
         }]
 
-        # Add to table
         self.table.add(data)
 
     def get_embedding(self, bookmark_id: str) -> Optional[Dict[str, Any]]:
@@ -228,7 +223,6 @@ class LanceDBClient:
             if not self.get_embedding(bookmark_id):
                 return False
 
-            # Delete by bookmark_id
             self.table.delete(f"bookmark_id = '{bookmark_id}'")
             return True
 
@@ -255,10 +249,7 @@ class LanceDBClient:
         existing = self.get_embedding(bookmark_id)
         model_name = existing["model_name"] if existing else "unknown"
 
-        # Delete old
         self.delete_embedding(bookmark_id)
-
-        # Add new
         self.add_embedding(bookmark_id, embedding, text, model_name)
 
     def count(self) -> int:

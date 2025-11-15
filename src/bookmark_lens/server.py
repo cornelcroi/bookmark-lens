@@ -19,14 +19,12 @@ from .services.embedding_service import EmbeddingService
 from .services.bookmark_service import BookmarkService
 from .services.search_service import SearchService
 
-# Setup logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Create MCP server
 app = Server("bookmark-lens")
 
 # Global service instances (initialized in main)
@@ -354,7 +352,6 @@ You: Call update_bookmark with id="abc123", tags=["tutorial"], tag_mode="append"
     raise ValueError(f"Unknown prompt: {name}")
 
 
-@app.call_tool()
 @app.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Handle tool calls from MCP clients."""
